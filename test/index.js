@@ -99,9 +99,11 @@ var tests = [{
     'test_lookup_with_family' : {
         topic : function () {
             var that = this;
-            dns.lookup('127.0.0.1',4, function() {
-                dns.lookup('::1', 6, function(err) {
-                    that.callback(err,dns.internalCache);
+            dns.lookup('127.0.0.1', 4, function() {
+                dns.lookup('::1', 6, function() {
+                    dns.lookup('127.0.0.1', { family: 4, hints: dns.ADDRCONFIG }, function(err) {
+                        that.callback(err, dns.internalCache);
+                    });
                 });
             });
         },
@@ -134,10 +136,10 @@ var tests = [{
             assert.isNotNull(topic.result);
             assert.equal(topic.cache.data['resolve_www.yahoo.com_A'].hit, 0, 'hit should be 0 for resolve');
         },
-        'test invalid family' : {
+        'test invalid type' : {
             topic : function () {
                 var that = this;
-                    dns.lookup('127.0.0.1', 7, function(err) {
+                    dns.resolve('www.yahoo.com', 'AAA', function(err) {
                         that.callback(null, err);
                     });
             },
